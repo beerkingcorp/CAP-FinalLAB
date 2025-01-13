@@ -11,7 +11,7 @@ jobs:
     name: Configurar Workflow Inicial
     runs-on: ubuntu-latest
     steps:
-      - name: Configurar Workflow Inicial
+      - name: Configurar Workflow
         uses: actions/checkout@v3
 
   SCA:
