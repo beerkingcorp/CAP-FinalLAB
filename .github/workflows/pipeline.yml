@@ -44,3 +44,57 @@ jobs:
         with:
           name: sca-report
           path: ./sca-report/*
+
+  Image_Security:
+    name: Análisis de Seguridad de Docker con Trivy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonando código fuente
+        uses: actions/checkout@v3
+
+      - name: Construyendo Imagen Docker
+        run: |
+          docker build -t my-app:latest -f Dockerfile .
+
+      - name: Verificando imágenes después de construir
+        run: |
+          docker images
+
+      - name: Chequeando Alpine version
+        run: docker run --rm my-app:latest cat /etc/os-release
+        
+
+      - name: Verificando si Docker está corriendo
+        run: |
+          docker info
+
+      - name: Entregando permisos a Docker
+        run: |
+          sudo usermod -aG docker $USER
+          newgrp docker
+
+      - name: Instalando Trivy
+        run: |
+          wget -qO- https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | bash
+          sudo mv ./bin/trivy /usr/local/bin/trivy
+
+      - name: Verificando instalación de Trivy
+        run: |
+          /usr/local/bin/trivy --version
+
+      - name: Ejecutando análisis de seguridad
+        run: |
+          mkdir -p ./trivy-report
+          /usr/local/bin/trivy image --scanners vuln --severity CRITICAL,HIGH,MEDIUM --exit-code 1 --no-progress --format json --output ./trivy-report/trivy-report.txt my-app:latest
+
+      - name: Verificando los archivos generados
+        run: |
+          echo "Archivos en ./trivy-report:"
+          ls -la ./trivy-report
+
+      - name: Subiendo reporte como artefacto
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: trivy-report
+          path: ./trivy-report/*
