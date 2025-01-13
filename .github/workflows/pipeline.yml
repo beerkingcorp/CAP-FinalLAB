@@ -1,4 +1,4 @@
-name: Pipeline CI/CD
+name: Pipeline
 
 on:
   push:
@@ -13,3 +13,34 @@ jobs:
     steps:
       - name: Configurar Workflow Inicial
         uses: actions/checkout@v3
+
+  SCA:
+    name: Analizando SCA con Dependency Check
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Descargando Dependency Check
+        run: |
+          curl -L --retry 3 --max-time 60 -o dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/download/v11.1.1/dependency-check-11.1.1-release.zip
+
+      - name: Descomprimiendo Dependency Check
+        run: |
+          unzip dependency-check.zip -d dependency-check
+          ls -la dependency-check
+
+      - name: Ejecutando análisis SCA
+        run: |
+          dependency-check/dependency-check/bin/dependency-check.sh --project "CAP-FinalLAB" \
+          --scan ./ --format ALL --out ./sca-report \
+          --failOnCVSS 4.0 \
+          --nvdApiKey ${{ secrets.NVD_API_KEY }}
+
+      - name: Subiendo reporte como artefacto
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: sca-report
+          path: ./sca-report/*
