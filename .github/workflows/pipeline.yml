@@ -112,7 +112,7 @@ jobs:
          
       - name: Configurar Docker Buildx
         run: |
-          docker build create --use
+          docker buildx create --use
         
       - name: Etiquetar imagen antes de empujar
         run: |
