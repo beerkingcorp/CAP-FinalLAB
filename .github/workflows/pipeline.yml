@@ -1,1 +1,15 @@
+name: Pipeline CI/CD
 
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  Workflow_Inicial:
+    name: Configurar Workflow Inicial
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configurar Workflow Inicial
+        uses: actions/checkout@v3
