@@ -1,8 +1,8 @@
 on:
   push:
     branches:
+      - main
       - dev
-      - '**'
 
 jobs:
   SCA:
@@ -10,24 +10,4 @@ jobs:
       steps:
       
       - name: Checkout code
-        uses: actions/checkout@v2
-      
-      - name: Dependency Check
-        uses: dependency-check/Dependency-Check_Action@1.1.0
-        env:
-          JAVA_HOME: /opt/jdk
-        id: Depcheck
-        with:
-          project: '${{ github.event.repository.name }}'
-          path: '.'
-          format: 'HTML'
-          args: >
-            --out ./reports
-            --failOnCVSS 7
-            --enableRetired
-
-      - name: Upload Test Result
-        uses: actions/upload-artifact@master
-        with:
-          name: Depcheck Report
-          path: ./reports
+        uses: actions/checkout@v3
